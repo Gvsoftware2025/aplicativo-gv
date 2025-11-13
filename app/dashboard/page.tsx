@@ -59,16 +59,15 @@ export default function DashboardPage() {
             <p className="text-slate-400">GV Software - Gerenciamento Completo</p>
           </div>
           <div className="flex gap-3">
-            {showInstallButton && (
-              <Button
-                onClick={handleInstall}
-                variant="outline"
-                className="border-purple-500/20 text-purple-400 hover:bg-purple-500/10 bg-transparent"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Instalar App
-              </Button>
-            )}
+            <Button
+              onClick={handleInstall}
+              variant="outline"
+              className="border-purple-500/20 text-purple-400 hover:bg-purple-500/10 bg-transparent"
+              disabled={!deferredPrompt}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              {deferredPrompt ? "Instalar App" : "App Instalável"}
+            </Button>
             <Button
               onClick={handleLogout}
               variant="outline"
