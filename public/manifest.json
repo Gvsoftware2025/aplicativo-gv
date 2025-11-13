@@ -2,7 +2,7 @@
   "name": "GV Software Admin",
   "short_name": "GV Admin",
   "description": "Aplicativo de gerenciamento GV Software",
-  "start_url": "/",
+  "start_url": "/admin-app",
   "display": "standalone",
   "background_color": "#020617",
   "theme_color": "#a855f7",
