@@ -1,25 +1,53 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { isAuthenticated } from "@/lib/pwa/auth"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { LayoutDashboard, FolderKanban, BarChart3, LogOut } from "lucide-react"
+import { LayoutDashboard, FolderKanban, BarChart3, LogOut, Download } from "lucide-react"
 import Link from "next/link"
 
 export default function DashboardPage() {
   const router = useRouter()
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
+  const [showInstallButton, setShowInstallButton] = useState(false)
 
   useEffect(() => {
     if (!isAuthenticated()) {
       router.push("/")
     }
+
+    const handler = (e: any) => {
+      e.preventDefault()
+      setDeferredPrompt(e)
+      setShowInstallButton(true)
+    }
+
+    window.addEventListener("beforeinstallprompt", handler)
+
+    if (window.matchMedia("(display-mode: standalone)").matches) {
+      setShowInstallButton(false)
+    }
+
+    return () => window.removeEventListener("beforeinstallprompt", handler)
   }, [router])
 
   const handleLogout = () => {
     localStorage.removeItem("admin_auth")
     router.push("/")
+  }
+
+  const handleInstall = async () => {
+    if (!deferredPrompt) return
+
+    deferredPrompt.prompt()
+    const { outcome } = await deferredPrompt.userChoice
+
+    if (outcome === "accepted") {
+      setDeferredPrompt(null)
+      setShowInstallButton(false)
+    }
   }
 
   return (
@@ -30,14 +58,26 @@ export default function DashboardPage() {
             <h1 className="text-3xl font-bold text-white mb-2">Painel Administrativo</h1>
             <p className="text-slate-400">GV Software - Gerenciamento Completo</p>
           </div>
-          <Button
-            onClick={handleLogout}
-            variant="outline"
-            className="border-red-500/20 text-red-400 hover:bg-red-500/10 bg-transparent"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Sair
-          </Button>
+          <div className="flex gap-3">
+            {showInstallButton && (
+              <Button
+                onClick={handleInstall}
+                variant="outline"
+                className="border-purple-500/20 text-purple-400 hover:bg-purple-500/10 bg-transparent"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Instalar App
+              </Button>
+            )}
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              className="border-red-500/20 text-red-400 hover:bg-red-500/10 bg-transparent"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Sair
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
