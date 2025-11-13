@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { login, isAuthenticated } from "@/lib/pwa/auth"
@@ -18,7 +19,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
   const [showInstallButton, setShowInstallButton] = useState(false)
-
   const router = useRouter()
 
   useEffect(() => {
@@ -33,6 +33,7 @@ export default function LoginPage() {
     }
     window.addEventListener("beforeinstallprompt", handler)
 
+    // Check if already installed
     if (window.matchMedia("(display-mode: standalone)").matches) {
       setShowInstallButton(false)
     }
@@ -40,12 +41,13 @@ export default function LoginPage() {
     return () => window.removeEventListener("beforeinstallprompt", handler)
   }, [router])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
     setError("")
+    setLoading(true)
 
-    const success = await login(password, rememberMe)
+    const success = login(password, rememberMe)
+
     if (success) {
       router.push("/dashboard")
     } else {
@@ -67,19 +69,19 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-slate-900/50 border-purple-500/20 backdrop-blur">
-        <CardHeader className="space-y-1 text-center">
-          <div className="flex justify-center mb-4">
-            <div className="rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 p-3">
-              <Lock className="w-8 h-8 text-white" />
-            </div>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950">
+      <Card className="w-full max-w-md border-purple-500/20 bg-slate-900/50 backdrop-blur">
+        <CardHeader className="space-y-4 text-center">
+          <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+            <Lock className="w-8 h-8 text-white" />
           </div>
-          <CardTitle className="text-2xl font-bold text-white">GV Software Admin</CardTitle>
-          <CardDescription className="text-slate-400">Aplicativo de gerenciamento</CardDescription>
+          <div>
+            <CardTitle className="text-2xl font-bold text-white">GV Software Admin</CardTitle>
+            <CardDescription className="text-slate-400">Aplicativo de gerenciamento</CardDescription>
+          </div>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <Input
                 type="password"
@@ -87,7 +89,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500"
-                required
+                disabled={loading}
               />
               {error && <p className="text-sm text-red-400">{error}</p>}
             </div>
@@ -97,38 +99,37 @@ export default function LoginPage() {
                 id="remember"
                 checked={rememberMe}
                 onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                className="border-slate-700 data-[state=checked]:bg-purple-600"
+                className="border-slate-700 data-[state=checked]:bg-purple-500"
               />
-              <Label htmlFor="remember" className="text-sm text-slate-400 cursor-pointer">
+              <Label htmlFor="remember" className="text-sm text-slate-400 cursor-pointer select-none">
                 Lembrar-me (manter conectado por 24h)
               </Label>
             </div>
 
             <Button
               type="submit"
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
               disabled={loading}
             >
               {loading ? "Entrando..." : "Entrar"}
             </Button>
           </form>
 
-          {showInstallButton && (
-            <div className="mt-4">
+          <div className="mt-6 pt-6 border-t border-slate-800 space-y-3">
+            {showInstallButton && (
               <Button
                 onClick={handleInstall}
                 variant="outline"
-                className="w-full border-purple-500/30 text-purple-400 hover:bg-purple-500/10 bg-transparent"
+                className="w-full border-purple-500/30 text-purple-400 hover:bg-purple-500/10 hover:text-purple-300 bg-transparent"
               >
                 <Download className="w-4 h-4 mr-2" />
                 Instalar Aplicativo
               </Button>
+            )}
+            <div className="flex items-center gap-2 text-sm text-slate-400 justify-center">
+              <Smartphone className="w-4 h-4" />
+              <span>Disponível como app mobile e desktop</span>
             </div>
-          )}
-
-          <div className="mt-6 text-center text-sm text-slate-500">
-            <Smartphone className="w-4 h-4 inline mr-2" />
-            Instale este app no seu dispositivo
           </div>
         </CardContent>
       </Card>
