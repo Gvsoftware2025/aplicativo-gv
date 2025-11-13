@@ -1,5 +1,5 @@
 const AUTH_KEY = "gv_admin_auth"
-const CORRECT_PASSWORD = "admin123" // Altere para sua senha real
+const CORRECT_PASSWORD = "GVAdmin!1530" // Altere para sua senha real
 
 export function login(password: string, rememberMe: boolean): boolean {
   if (password === CORRECT_PASSWORD) {
