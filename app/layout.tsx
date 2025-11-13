@@ -1,19 +1,18 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
+import { Geist } from "next/font/google"
 import "./globals.css"
+import { Toaster } from "@/components/ui/toaster"
+
+const geist = Geist({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "GV Software Admin",
-  description: "Sistema de gerenciamento GV Software",
-  generator: "v0.app",
+  title: "GV Admin - Sistema de Gerenciamento",
+  description: "Painel administrativo para gerenciar projetos",
   manifest: "/manifest.json",
-  icons: {
-    icon: "/icon-192.png",
-    apple: "/icon-512.png",
-  },
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: "GV Admin",
   },
 }
@@ -28,12 +27,18 @@ export const viewport: Viewport = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
     <html lang="pt-BR">
-      <body>{children}</body>
+      <head>
+        <link rel="apple-touch-icon" href="/icon-192.png" />
+      </head>
+      <body className={geist.className}>
+        {children}
+        <Toaster />
+      </body>
     </html>
   )
 }
